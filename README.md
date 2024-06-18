@@ -1,6 +1,5 @@
 # ENS Bus Ticket Booking System
 
-![Project Logo](https://ensbusticket-kocaemre-emres-projects-ba2fe695.vercel.app/logo.png)
 
 ## Overview
 

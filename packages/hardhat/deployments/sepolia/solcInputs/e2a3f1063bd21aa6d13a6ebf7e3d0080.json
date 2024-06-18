@@ -1,0 +1,41 @@
+{
+  "language": "Solidity",
+  "sources": {
+    "@openzeppelin/contracts/access/Ownable.sol": {
+      "content": "// SPDX-License-Identifier: MIT\n// OpenZeppelin Contracts (last updated v4.9.0) (access/Ownable.sol)\n\npragma solidity ^0.8.0;\n\nimport \"../utils/Context.sol\";\n\n/**\n * @dev Contract module which provides a basic access control mechanism, where\n * there is an account (an owner) that can be granted exclusive access to\n * specific functions.\n *\n * By default, the owner account will be the one that deploys the contract. This\n * can later be changed with {transferOwnership}.\n *\n * This module is used through inheritance. It will make available the modifier\n * `onlyOwner`, which can be applied to your functions to restrict their use to\n * the owner.\n */\nabstract contract Ownable is Context {\n    address private _owner;\n\n    event OwnershipTransferred(address indexed previousOwner, address indexed newOwner);\n\n    /**\n     * @dev Initializes the contract setting the deployer as the initial owner.\n     */\n    constructor() {\n        _transferOwnership(_msgSender());\n    }\n\n    /**\n     * @dev Throws if called by any account other than the owner.\n     */\n    modifier onlyOwner() {\n        _checkOwner();\n        _;\n    }\n\n    /**\n     * @dev Returns the address of the current owner.\n     */\n    function owner() public view virtual returns (address) {\n        return _owner;\n    }\n\n    /**\n     * @dev Throws if the sender is not the owner.\n     */\n    function _checkOwner() internal view virtual {\n        require(owner() == _msgSender(), \"Ownable: caller is not the owner\");\n    }\n\n    /**\n     * @dev Leaves the contract without owner. It will not be possible to call\n     * `onlyOwner` functions. Can only be called by the current owner.\n     *\n     * NOTE: Renouncing ownership will leave the contract without an owner,\n     * thereby disabling any functionality that is only available to the owner.\n     */\n    function renounceOwnership() public virtual onlyOwner {\n        _transferOwnership(address(0));\n    }\n\n    /**\n     * @dev Transfers ownership of the contract to a new account (`newOwner`).\n     * Can only be called by the current owner.\n     */\n    function transferOwnership(address newOwner) public virtual onlyOwner {\n        require(newOwner != address(0), \"Ownable: new owner is the zero address\");\n        _transferOwnership(newOwner);\n    }\n\n    /**\n     * @dev Transfers ownership of the contract to a new account (`newOwner`).\n     * Internal function without access restriction.\n     */\n    function _transferOwnership(address newOwner) internal virtual {\n        address oldOwner = _owner;\n        _owner = newOwner;\n        emit OwnershipTransferred(oldOwner, newOwner);\n    }\n}\n"
+    },
+    "@openzeppelin/contracts/utils/Context.sol": {
+      "content": "// SPDX-License-Identifier: MIT\n// OpenZeppelin Contracts v4.4.1 (utils/Context.sol)\n\npragma solidity ^0.8.0;\n\n/**\n * @dev Provides information about the current execution context, including the\n * sender of the transaction and its data. While these are generally available\n * via msg.sender and msg.data, they should not be accessed in such a direct\n * manner, since when dealing with meta-transactions the account sending and\n * paying for execution may not be the actual sender (as far as an application\n * is concerned).\n *\n * This contract is only required for intermediate, library-like contracts.\n */\nabstract contract Context {\n    function _msgSender() internal view virtual returns (address) {\n        return msg.sender;\n    }\n\n    function _msgData() internal view virtual returns (bytes calldata) {\n        return msg.data;\n    }\n}\n"
+    },
+    "contracts/YourContract.sol": {
+      "content": "//SPDX-License-Identifier: MIT\r\npragma solidity >=0.8.0 <0.9.0;\r\n\r\n// Use openzeppelin to inherit battle-tested implementations (ERC20, ERC721, etc)\r\nimport \"@openzeppelin/contracts/access/Ownable.sol\";\r\n\r\ncontract YourContract is Ownable {\r\n\t//iade etme fonksiyonu ekle\r\n\r\n    event TicketBooked(address seatOwnerAdress, uint256 index, uint256 seatNumber);\r\n    \r\n\r\n\tstruct BusTicket {\r\n\t\tstring from;\r\n\t\tstring to;\r\n\t\tstring date;\r\n\t\tstring duration;\r\n\t\tuint256 price;\r\n\t\tuint256 seatCapacity;\r\n\t\tuint256 availableSeat;\r\n\t\t\r\n\t\tbool[] seatMap;\r\n\t}\r\n\r\n\tuint256 public id=0;\r\n\r\n\tmapping(uint256 => mapping(address => uint256)) public seatOwner; // mapping of ticket ID to owner's seat number\r\n\r\n\tBusTicket[] public busTickets;\r\n\r\n\tfunction getSeatMap(uint256 index) public view returns (bool[] memory) {\r\n\t\treturn busTickets[index].seatMap;\r\n\t}\r\n\r\n\r\n\tfunction addBusTicket(\r\n\t\tstring memory _from,\r\n\t\tstring memory _to,\r\n\t\tstring memory _date,\r\n\t\tstring memory _duration,\r\n\t\tuint256 _price,\r\n\t\tuint256 _seatCapacity\r\n\t) public onlyOwner {\r\n\t\trequire(_seatCapacity > 0, \"Seat capacity must be greater than 0\");\r\n\t\trequire(_price > 0, \"Price must be greater than 0\");\r\n\t\tbool[] memory _array = new bool[](_seatCapacity+1);\r\n\r\n\t\tbusTickets.push(\r\n\t\t\tBusTicket(\r\n\t\t\t\t_from,\r\n\t\t\t\t_to,\r\n\t\t\t\t_date,\r\n\t\t\t\t_duration,\r\n\t\t\t\t_price,\r\n\t\t\t\t_seatCapacity,\r\n\t\t\t\t_seatCapacity,\r\n\t\t\t\t_array\r\n\t\t\t)\r\n\t\t);\r\n\t\tid++;\r\n\t}\r\n\r\n\tfunction bookTicket(uint256 seatNumber, uint256 index) public payable {\r\n        require(seatNumber > 0, \"Seat number must be greater than 0\");\r\n\t\trequire(index < busTickets.length, \"Bus ticket index out of bounds\");\r\n\t\trequire(\r\n\t\t\tseatNumber < busTickets[index].seatCapacity,\r\n\t\t\t\"Seat number is greater than seat capacity\"\r\n\t\t);\r\n\t\trequire(\r\n\t\t\tbusTickets[index].seatMap[seatNumber] == false,\r\n\t\t\t\"Seat is already booked\"\r\n\t\t);\r\n\t\trequire(\r\n\t\t\tmsg.value == busTickets[index].price,\r\n\t\t\t\"Please send the correct amount of ETH\"\r\n\t\t);\r\n\t\trequire(\r\n\t\t\tseatOwner[index][msg.sender] == 0,\r\n\t\t\t\"You have already booked a seat\"\r\n\t\t);\r\n\r\n\t\tbusTickets[index].availableSeat--;\r\n\t\tbusTickets[index].seatMap[seatNumber] = true;\r\n\t\tseatOwner[index][msg.sender] = seatNumber;\r\n        emit TicketBooked(msg.sender, index, seatNumber);\r\n\t}\r\n\r\n\tfunction withdraw() public onlyOwner {\r\n\t\t// Call returns a boolean value indicating success or failure.\r\n\t\t// This is the current recommended method to use.\r\n\t\t(bool sent, ) = msg.sender.call{ value: address(this).balance }(\"\");\r\n\t\trequire(sent, \"Failed to send Ether\");\r\n\t}\r\n}\r\n"
+    }
+  },
+  "settings": {
+    "optimizer": {
+      "enabled": true,
+      "runs": 200
+    },
+    "outputSelection": {
+      "*": {
+        "*": [
+          "abi",
+          "evm.bytecode",
+          "evm.deployedBytecode",
+          "evm.methodIdentifiers",
+          "metadata",
+          "devdoc",
+          "userdoc",
+          "storageLayout",
+          "evm.gasEstimates"
+        ],
+        "": [
+          "ast"
+        ]
+      }
+    },
+    "metadata": {
+      "useLiteralContent": true
+    }
+  }
+}

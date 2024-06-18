@@ -40,7 +40,6 @@ yarn install
 > in the same terminal, start your local network (a blockchain emulator in your computer):
 
 ```sh
-cd web3BusTicketSystem
 yarn chain
 ```
 

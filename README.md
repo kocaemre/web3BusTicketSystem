@@ -20,7 +20,6 @@ The ENS Bus Ticket Booking System is a web application that allows users to book
 - **Deployment**: Vercel
 
 ## Getting Started
--
 
 ## Install 📚
 

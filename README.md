@@ -53,7 +53,7 @@ yarn deploy
 > in a third terminal window, start your 📱 frontend:
 
 ```sh
-cd challenge-1-decentralized-staking
+cd web3BusTicketSystem
 yarn start
 ```
 
